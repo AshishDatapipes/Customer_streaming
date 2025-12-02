@@ -1,8 +1,9 @@
 version: 2
 
 sources:
-  - name: ga4
-    database: customerlab-479311        
-    schema: customer_lab       
+  - name: ga4_public
+    database: bigquery-public-data
+    schema: ga4_obfuscated_sample_ecommerce
     tables:
-      - name: events_raw                
+      - name: events_20210131
+

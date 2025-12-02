@@ -1,23 +1,22 @@
 {{ config(materialized='table', schema='customer_lab') }}
 
 SELECT
-  -- Grain: one row per user per session per day
+  -- Core identifiers
   user_pseudo_id,
   event_date,
-
-  -- Session identifiers
   MIN(event_timestamp) AS session_start_ts,
   MAX(event_timestamp) AS session_end_ts,
-
-  -- Engagement metrics
-  COUNTIF(event_name = "page_view") AS pageviews,
-  COUNTIF(event_name = "purchase") AS purchases,
-  SUM(engagement_time_msec) AS total_engagement_time,
 
   -- Campaign attribution
   campaign_source,
   campaign_medium,
   campaign_name,
+
+  -- Engagement metrics
+  COUNTIF(event_name = "session_start") AS sessions,
+  COUNTIF(event_name = "page_view") AS pageviews,
+  COUNTIF(event_name = "purchase") AS purchases,
+  SUM(engagement_time_msec) AS total_engagement_time,
 
   -- Device & geo context
   device_category,
