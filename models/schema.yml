@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: stg_ga4_events
+    description: "Staging model for GA4 events."
+    columns:
+      - name: event_id
+        description: "Unique identifier for the event."
+        tests:
+          - not_null
+      - name: event_name
+        description: "Name of the GA4 event."
+        tests:
+          - not_null
+      - name: event_timestamp
+        description: "Timestamp when the event occurred."
+        tests:
+          - not_null
+      - name: user_id
+        description: "User identifier."
+        tests:
+          - not_null
+
+  - name: fct_sessions
+    description: "Fact table of GA4 sessions."
+    columns:
+      - name: user_pseudo_id
+        description: "GA4 user identifier."
+        tests:
+          - not_null
+      - name: session_id
+        description: "Session identifier."
+        tests:
+          - not_null
+      - name: session_start
+        description: "Timestamp when the session started."
+        tests:
+          - not_null
+      - name: platform
+        description: "Platform (WEB, APP)."
+        tests:
+          - accepted_values:
+              values: ["WEB", "APP"]
+      - name: conversion_flag
+        tests: [not_null]

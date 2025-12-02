@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: ga4
+    database: customerlab-479311        
+    schema: customer_lab       
+    tables:
+      - name: events_raw                
