@@ -1,22 +1,44 @@
-{{ config(materialized='table', schema='customer_lab') }}
+{{ config(materialized='table') }}
 
 SELECT
-  -- Core identifiers
+  DATE(session_start) AS event_date,
   user_pseudo_id,
-  event_date,
-  MIN(event_timestamp) AS session_start_ts,
-  MAX(event_timestamp) AS session_end_ts,
-
-  -- Campaign attribution
-  campaign_source,
-  campaign_medium,
-  campaign_name,
+  session_id,
 
   -- Engagement metrics
-  COUNTIF(event_name = "session_start") AS sessions,
-  COUNTIF(event_name = "page_view") AS pageviews,
-  COUNTIF(event_name = "purchase") AS purchases,
-  SUM(engagement_time_msec) AS total_engagement_time,
+  pageviews,
+  total_engagement_time_msec,
+
+  -- First‑click attribution (campaign at session start)
+  FIRST_VALUE(campaign_source) OVER (
+    PARTITION BY user_pseudo_id, session_id
+    ORDER BY session_start
+  ) AS first_click_source,
+  FIRST_VALUE(campaign_medium) OVER (
+    PARTITION BY user_pseudo_id, session_id
+    ORDER BY session_start
+  ) AS first_click_medium,
+  FIRST_VALUE(campaign_name) OVER (
+    PARTITION BY user_pseudo_id, session_id
+    ORDER BY session_start
+  ) AS first_click_name,
+
+  -- Last‑click attribution (campaign at session end)
+  LAST_VALUE(campaign_source) OVER (
+    PARTITION BY user_pseudo_id, session_id
+    ORDER BY session_end
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS last_click_source,
+  LAST_VALUE(campaign_medium) OVER (
+    PARTITION BY user_pseudo_id, session_id
+    ORDER BY session_end
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS last_click_medium,
+  LAST_VALUE(campaign_name) OVER (
+    PARTITION BY user_pseudo_id, session_id
+    ORDER BY session_end
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS last_click_name,
 
   -- Device & geo context
   device_category,
@@ -24,16 +46,4 @@ SELECT
   browser,
   country,
   city
-FROM {{ ref('stg_ga4_events') }}
-WHERE event_name IN ("session_start", "page_view", "purchase")
-GROUP BY
-  user_pseudo_id,
-  event_date,
-  campaign_source,
-  campaign_medium,
-  campaign_name,
-  device_category,
-  device_os,
-  browser,
-  country,
-  city
+FROM {{ ref('fct_sessions') }}

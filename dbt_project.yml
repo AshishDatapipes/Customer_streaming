@@ -1,29 +1,17 @@
-name: customerlabs_attribution
-version: 1.0.0
+name: "customerlab"
+version: "1.0.0"
 config-version: 2
 
-profile: customerlabs_profile # must match your dbt Cloud connection
-
-source-paths: ["models"]
-analysis-paths: ["analyses"]
-test-paths: ["tests"]
-seed-paths: ["seeds"]
-macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
-
-target-path: "target"
-clean-targets:
-  - "target"
-  - "dbt_packages"
+profile: "customerlab"
 
 models:
   customerlab:
+    # remove +schema override, let dbt Cloud handle dataset
     staging:
-      +schema: customer_lab
-      +materialized: view
+      +materialized: view   # lightweight views for raw GA4 events
+
     intermediate:
-      +schema: customer_lab
-      +materialized: table
+      +materialized: table  # stable tables for session logic
+
     marts:
-      +schema: customer_lab
-      +materialized: table
+      +materialized: table  # fact/mart tables for dashboards

@@ -2,8 +2,47 @@ version: 2
 
 sources:
   - name: ga4_public
+    description: "Google Analytics 4 public sample dataset for ecommerce events"
     database: bigquery-public-data
     schema: ga4_obfuscated_sample_ecommerce
     tables:
       - name: events_20210131
-
+        description: "GA4 sample events for January 31, 2021"
+        columns:
+          - name: event_date
+            description: "Date of the event in YYYYMMDD format"
+            tests:
+              - not_null
+          - name: event_timestamp
+            description: "Event timestamp in microseconds"
+            tests:
+              - not_null
+          - name: event_name
+            description: "GA4 event name (e.g., page_view, purchase)"
+          - name: user_pseudo_id
+            description: "Anonymous GA4 user identifier"
+          - name: page_location
+            description: "Full URL of the page where the event occurred"
+          - name: page_referrer
+            description: "Referrer URL leading to the current page"
+          - name: engagement_time_msec
+            description: "Time spent on the page in milliseconds"
+          - name: device_category
+            description: "Device type (desktop, mobile, tablet)"
+            tests:
+              - accepted_values:
+                  values: ["desktop", "mobile", "tablet"]
+          - name: device_os
+            description: "Operating system of the device"
+          - name: browser
+            description: "Browser used"
+          - name: country
+            description: "Country of the user"
+          - name: city
+            description: "City of the user"
+          - name: campaign_name
+            description: "Marketing campaign name (UTM)"
+          - name: campaign_medium
+            description: "Marketing medium (UTM)"
+          - name: campaign_source
+            description: "Marketing source (UTM)"
